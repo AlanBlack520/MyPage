@@ -1,0 +1,277 @@
+/* 水印功能区域容器 */
+.watermark-section {
+    padding: 2rem;
+    background: #f5f5f5;  /* 浅灰色背景 */
+}
+
+/* 水印工具主容器 */
+.watermark-container {
+    max-width: 1200px;  /* 最大宽度限制 */
+    margin: 0 auto;     /* 水平居中 */
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);  /* 阴影效果 */
+}
+
+.watermark-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.image-preview {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.upload-placeholder {
+    text-align: center;
+    color: #666;
+}
+
+.upload-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.watermark-controls {
+    margin: 20px 0;
+}
+
+.watermark-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#watermarkText {
+    width: 200px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.strength-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#watermarkStrength {
+    width: 150px;
+}
+
+#strengthValue {
+    min-width: 30px;
+    text-align: center;
+}
+
+/* 统一的按钮样式 */
+.upload-btn, .generate-btn, .download-btn {
+    padding: 8px 20px;
+    height: 36px;
+    font-size: 14px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.upload-btn:hover, .generate-btn:hover, .download-btn:hover {
+    background: #45a049;
+}
+
+.result-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.result-image {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.result-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* 对话块样式 */
+.progress-dialog {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 17, 23, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-content {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #00ff9d;
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+    text-align: center;
+    color: #fff;
+}
+
+.progress-bar {
+    width: 300px;
+    height: 6px;
+    background: #2c2c2c;
+    border-radius: 3px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #00ff9d;
+    transition: width 0.3s ease;
+}
+
+#progressText {
+    margin-top: 0.5rem;
+    color: #ccc;
+}
+
+/* 更新样式 */
+.watermark-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.strength-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#watermarkStrength {
+    width: 100px;
+}
+
+#strengthValue {
+    min-width: 30px;
+    text-align: center;
+}
+
+.upload-btn {
+    margin-top: 15px;  /* 增加与预览区域的间距 */
+}
+
+/* 进度对话框样式 */
+.progress-dialog {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.progress-content {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #00ff9d;
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+    text-align: center;
+    color: #fff;
+}
+
+.progress-bar {
+    width: 300px;
+    height: 10px;
+    background: #2c2c2c;
+    border-radius: 5px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #00ff9d;
+    transition: width 0.3s ease;
+} 
