@@ -167,7 +167,7 @@ async function generateWatermark() {
         // 本地测试
         // const response = await fetch('http://localhost:8000/api/watermark', {
         // 线上测试
-        const response = await fetch('/api/watermark', {
+        const response = await fetch('http://150.158.171.139:8000/api/watermark', {
             method: 'POST',
             body: formData
         });
