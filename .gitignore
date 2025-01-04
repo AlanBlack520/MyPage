@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 环境文件
+.env
+
+# IDE
+.vscode/
+.idea/ 
