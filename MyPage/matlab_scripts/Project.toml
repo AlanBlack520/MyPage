@@ -1,8 +1,0 @@
-name = "WatermarkProject"
-uuid = "1b93d53c-9c48-4a9d-a5a6-d6a58d30e2f3"
-version = "0.1.0"
-
-[deps]
-Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
-ImageDraw = "4381153b-2b60-58ae-a1ba-fd683676385f"
-Cairo = "159f3aea-2a34-519c-b102-8c37f9878175" 
