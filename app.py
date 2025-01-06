@@ -13,17 +13,26 @@ import time  # 时间处理
 import asyncio  # 异步IO
 from io import BytesIO  # 二进制IO
 from api.zhipu import chat_with_ai  # 导入智谱AI聊天功能
+import platform
 
 # 配置日志
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# 创建路由
+routes = web.RouteTableDef()
+
 # 获取当前脚本所在目录
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 logger.info(f"脚本目录: {SCRIPT_DIR}")
 
-# 设置临时目录
+# 设置临时目录和输出目录
 TEMP_DIR = os.path.join(SCRIPT_DIR, "temp")
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "static", "output")
+
+# 确保输出目录存在
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR)
 logger.info(f"临时目录: {TEMP_DIR}")
@@ -31,6 +40,12 @@ logger.info(f"临时目录: {TEMP_DIR}")
 # 设置Julia脚本目录
 MWORKS_SCRIPTS_PATH = os.path.join(SCRIPT_DIR, "mworks_scripts")
 logger.info(f"Julia脚本目录: {MWORKS_SCRIPTS_PATH}")
+
+# 根据操作系统设置 Julia 路径
+if platform.system() == 'Windows':
+    JULIA_PATH = r"C:\\Users\\Public\\TongYuan\\julia-1.9.3\\bin\\julia.exe"  # 替换为实际路径
+else:
+    JULIA_PATH = "/usr/local/bin/julia"
 
 async def handle_watermark(request):
     """处理水印请求的路由函数"""
@@ -70,7 +85,8 @@ async def handle_watermark(request):
             # 调用Julia脚本处理水印
             script_path = os.path.join(MWORKS_SCRIPTS_PATH, "watermark.jl")
             process = await asyncio.create_subprocess_exec(
-                "julia", script_path, input_path, output_path, params_path,
+                JULIA_PATH,
+                script_path, input_path, output_path, params_path,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
@@ -125,6 +141,50 @@ async def test(request):
     """测试路由处理函数"""
     return web.Response(text="服务器正常运行")
 
+@routes.post('/api/restore')
+async def restore_image(request):
+    try:
+        data = await request.post()
+        image = data['image']
+        
+        # 保存上传的图片
+        input_path = os.path.join(TEMP_DIR, f"restore_input_{int(time.time())}.png")
+        output_path = os.path.join(OUTPUT_DIR, f"restored_{int(time.time())}.png")
+        
+        with open(input_path, 'wb') as f:
+            f.write(image.file.read())
+            
+        # 调用 Julia 复原脚本
+        script_path = os.path.join(MWORKS_SCRIPTS_PATH, "restore.jl")
+        process = await asyncio.create_subprocess_exec(
+            JULIA_PATH,
+            script_path, input_path, output_path,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        stdout, stderr = await process.communicate()
+        
+        if process.returncode == 0:
+            return web.json_response({
+                'status': 'success',
+                'output': os.path.basename(output_path)
+            })
+        else:
+            raise Exception(f"复原失败: {stderr.decode()}")
+            
+    except Exception as e:
+        logger.error(f"处理复原请求时发生错误: {str(e)}")
+        return web.json_response({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+# 路由处理函数
+@routes.get('/')
+async def hello(request):
+    return web.Response(text="服务器正常运行")
+
 if __name__ == "__main__":
     try:
         # 环境检查
@@ -151,6 +211,7 @@ if __name__ == "__main__":
         app.router.add_get('/test', test)
         app.router.add_post('/api/watermark', handle_watermark)
         app.router.add_post('/api/chat', handle_chat)
+        app.router.add_post('/api/restore', restore_image)
         
         # 应用CORS设置到路由
         for route in list(app.router.routes()):

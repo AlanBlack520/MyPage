@@ -17,6 +17,7 @@
     border-radius: 15px;
     padding: 2rem;
     box-shadow: 0 0 30px var(--glow-color);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 255, 157, 0.2);
     border-top: 3px solid rgba(0, 255, 157, 0.5);

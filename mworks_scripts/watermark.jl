@@ -21,12 +21,11 @@ function add_watermark(image_path, output_path, text, opacity)
         
         # 生成水印
         watermark = zeros(size(dct_img))
-        # 将文本转换为Unicode码点
-        text_values = [Int(c) % 255 for c in text]  # 对Unicode码点取模以限制范围
+        text_values = [Int(c) % 255 for c in text]
         
         # 计算合适的水印强度
         max_coeff = maximum(abs.(dct_img))
-        strength = opacity_float * max_coeff * 0.01  # 使用转换后的浮点数
+        strength = opacity_float * max_coeff * 0.01
         
         # 在中频区域嵌入水印
         height, width = size(dct_img)
@@ -36,12 +35,8 @@ function add_watermark(image_path, output_path, text, opacity)
         for (j, val) in enumerate(text_values)
             if j <= min(mid_h, mid_w)
                 normalized_val = (val / 255.0) * strength
-                
-                # 对角线位置
                 watermark[mid_h+j, mid_w+j] = normalized_val
                 watermark[mid_h-j, mid_w-j] = normalized_val
-                
-                # 十字形位置
                 watermark[mid_h+j, mid_w] = normalized_val
                 watermark[mid_h-j, mid_w] = normalized_val
                 watermark[mid_h, mid_w+j] = normalized_val

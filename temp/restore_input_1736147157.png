@@ -15,7 +15,7 @@
     <!-- 导航栏 -->
     <nav class="navbar">
         <div class="nav-logo">
-            <div class="logo-text">张俊</div>
+            <div class="logo-text">Novice</div>
             <div class="welcome-text">欢迎来到我的个人网站</div>
         </div>
         <div class="nav-links">

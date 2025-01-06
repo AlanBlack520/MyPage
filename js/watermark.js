@@ -112,15 +112,18 @@ function showProgress() {
     const dialog = document.getElementById('progressDialog');
     const fill = dialog.querySelector('.progress-fill');
     const text = document.getElementById('progressText');
+    const title = document.getElementById('progressTitle');
     
     dialog.style.display = 'flex';
     fill.style.width = '0%';
     text.textContent = '处理中...';
+    title.textContent = '处理中...';
     
     return {
-        update: (percent, message) => {
+        update: (percent, message, titleText) => {
             fill.style.width = `${percent}%`;
             if (message) text.textContent = message;
+            if (titleText) title.textContent = titleText;
         },
         hide: () => {
             dialog.style.display = 'none';
@@ -156,23 +159,24 @@ async function generateWatermark() {
 
         // 显示进度
         const progress = showProgress();
-        progress.update(20, '准备处理...');
-
+        progress.update(20, '准备处理...', '正在生成水印...');
+        
         const formData = new FormData();
         formData.append('file', file);
         formData.append('text', text);
         formData.append('opacity', strength);
 
-        progress.update(40, '正在上传...');
+        progress.update(40, '正在上传...', '正在生成水印...');
+        
         // 本地测试
-        // const response = await fetch('http://localhost:8000/api/watermark', {
+        //const response = await fetch('http://localhost:8000/api/watermark', {
         // 线上测试
         const response = await fetch('http://150.158.171.139:8000/api/watermark', {
             method: 'POST',
             body: formData
         });
 
-        progress.update(80, '处理中...');
+        progress.update(80, '处理中...', '正在生成水印...');
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -181,7 +185,7 @@ async function generateWatermark() {
         const blob = await response.blob();
         const imageUrl = URL.createObjectURL(blob);
         
-        progress.update(100, '完成！');
+        progress.update(100, '完成！', '水印生成完成！');
         setTimeout(() => progress.hide(), 500);
 
         // 显示水印图片
@@ -197,13 +201,73 @@ async function generateWatermark() {
 
 // 处理图片下载
 function downloadImage() {
-    if (watermarkedImage.src) {
-        const link = document.createElement('a');
-        link.href = watermarkedImage.src;
-        link.download = 'watermarked_image.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const watermarkedImage = document.getElementById('watermarkedImage');
+    if (!watermarkedImage.src || watermarkedImage.src === '' || watermarkedImage.src === 'data:,' || watermarkedImage.naturalWidth === 0) {
+        alert('请先生成水印图片');
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = watermarkedImage.src;
+    link.download = 'watermarked_image.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// 处理复原图片下载
+function downloadRestoredImage() {
+    const restoredImage = document.getElementById('restoredImage');
+    if (!restoredImage.src || restoredImage.src === '' || restoredImage.src === 'data:,' || restoredImage.naturalWidth === 0) {
+        alert('请先生成复原图片');
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = restoredImage.src;
+    link.download = 'restored_image.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// 添加复原功能
+async function restoreImage() {
+    const watermarkedImage = document.getElementById('watermarkedImage');
+    if (!watermarkedImage.src || watermarkedImage.src === '' || watermarkedImage.src === 'data:,' || watermarkedImage.naturalWidth === 0) {
+        alert('请先生成水印图片');
+        return;
+    }
+
+    try {
+        // 显示进度
+        const progress = showProgress();
+        progress.update(20, '准备处理...', '正在复原图片...');
+
+        const formData = new FormData();
+        formData.append('image', await fetch(watermarkedImage.src).then(r => r.blob()));
+
+        progress.update(40, '正在上传...', '正在复原图片...');
+        const response = await fetch('http://150.158.171.139:8000/api/restore', {
+            method: 'POST',
+            body: formData
+        });
+
+        progress.update(80, '正在复原...', '正在复原图片...');
+        const data = await response.json();
+        if (data.status === 'success') {
+            const restoredImage = document.getElementById('restoredImage');
+            const downloadRestoredBtn = document.getElementById('downloadRestoredBtn');
+            restoredImage.src = 'static/output/' + data.output;
+            restoredImage.classList.remove('hidden');
+            downloadRestoredBtn.classList.remove('hidden');
+            progress.update(100, '完成！', '图片复原完成！');
+            setTimeout(() => progress.hide(), 500);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('复原失败，请重试');
+        progress.hide();
     }
 }
 
@@ -222,6 +286,12 @@ function initEventListeners() {
 
     // 监听下载按钮点击
     downloadBtn.addEventListener('click', downloadImage);
+
+    // 监听复原图片下载按钮点击
+    document.getElementById('downloadRestoredBtn').addEventListener('click', downloadRestoredImage);
+
+    // 添加事件监听
+    document.getElementById('restoreImage').addEventListener('click', restoreImage);
 }
 
 // 启动应用
